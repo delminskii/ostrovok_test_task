@@ -1,4 +1,4 @@
-VIA [ostrovok test task for python dev](https://github.com/ostrovok-team/code-challenge/blob/master/python/README.md)
+VIA [ostrovok test task for python dev](https://github.com/ostrovok-team/code-challenge/tree/master/python)
 
 ## Тестовые задания для Python
 
