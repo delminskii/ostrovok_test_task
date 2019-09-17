@@ -4,12 +4,14 @@ import argparse
 import datetime
 import os
 import aiohttp
+import asyncio
+from bs4 import BeautifulSoup as BS4
 import helpers
 
 
-def main():
+async def main():
     parser = argparse.ArgumentParser(
-        description='A wallpaper downloader for smashingmagazine.com'
+        description='Smashing Wallpaper Downloader'
     )
 
     curr_month = datetime.datetime.now().strftime('%b')
@@ -57,27 +59,43 @@ def main():
     )
 
     args = parser.parse_args()
-    # print(args)
-    # print(f"resolution: {args.resolution}")
-    # print(f"month: {args.month}")
-    # print(f"year: {args.year}")
-    # print(f"output: {args.output}")
+    print(args)
 
     # form an url
     url_pattern = 'https://www.smashingmagazine.com/{year}/' \
-        '{numeric_month}/desktop-wallpaper-calendars-{month_fullname}-{year}/'
+        '{month_numeric}/desktop-wallpaper-calendars-{month_fullname}-{year}/'
 
     url = url_pattern.format(
         year=args.year,
-        numeric_month=months.get(args.month)[0],
+        month_numeric=months.get(args.month)[0],
         month_fullname=months.get(args.month)[1]
-    )
-    with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            if response.status == 200:
+    ).lower()
 
-            markup = await response.text()
+    print(f"Url: {url}")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            print('Response status code:', response.status)
+            if response.status == 200:
+                markup = await response.text()
+                soup = BS4(markup, 'lxml')
+                wallpapers_urls = helpers.get_wallpaper_links(
+                    soup,
+                    args.resolution
+                )
+
+                print(wallpapers_urls)
+                print(len(wallpapers_urls))
+
+                # if wallpaper_urls:
+
+                # else:
+                #     # TODO
+            else:
+                # TODO
+                pass
 
 
 if __name__ == '__main__':
-    main()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    loop.close()

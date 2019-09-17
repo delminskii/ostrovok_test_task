@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import aiofiles
 
 
 def is_resolution(parser, resolution_str, pattern=r'\d+x\d+'):
@@ -27,3 +28,17 @@ def is_year(parser, year_str, pattern=r'[12]\d{3}'):
     if re.match(pattern, year_str) is None:
         parser.error(f"`{year_str}` does not fit good to year in YYYY format")
     return year_str
+
+
+def get_wallpaper_links(soup, resolution):
+    """return a `href` value of `a` tag for a images with `resolution`
+
+    :param soup: BS4 object
+    :param resolution: walpapper resolution. Example: 1900x600
+    """
+    a_tags = soup.select('#article__content ul > li > a')
+    a_tags = filter(lambda a: a.text.strip() == resolution, a_tags)
+
+    hrefs = map(lambda a: a.get('href'), a_tags)
+    hrefs = filter(bool, hrefs)
+    return list(hrefs)
