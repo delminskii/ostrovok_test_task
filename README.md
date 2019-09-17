@@ -33,5 +33,5 @@ Indexes:
 
 #### Example run
 ```bash
-    python3.7 download_pictures.py 320x480 -m Dec -y 2018
+$ python3.7 download_pictures.py 320x480 -m Dec -y 2018
 ```
