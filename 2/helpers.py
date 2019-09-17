@@ -11,19 +11,8 @@ def is_resolution(parser, resolution_str, pattern=r'\d+x\d+'):
     :param pattern: regexp pattern whether to match resolution_str string
     """
     if re.match(pattern, resolution_str) is None:
-        parser.error(f'{resolution_str} does not fit good to image resolution')
+        parser.error(f"{resolution_str} does not fit good to image resolution")
     return resolution_str.lower()
-    # return bool(re.match(pattern, resolution_str))
-
-
-def is_month(parser, month_str):
-    month_str = month_str.lower()
-    possible_months = (
-        'Jan', 'Feb', 'Mar', 'Apr',
-        'May', 'Jun', 'Jul', 'Aug',
-        'Sep', 'Oct', 'Nov', 'Dec'
-    )
-    # TODO
 
 
 def is_year(parser, year_str, pattern=r'[12]\d{3}'):
@@ -33,5 +22,6 @@ def is_year(parser, year_str, pattern=r'[12]\d{3}'):
     :param year_str: source string for year. Example: 2012
     :param pattern: regexp pattern while to match year_str string
     """
-    # TODO
-    pass
+    if re.match(pattern, year_str) is None:
+        parser.error(f"{year_str} does not fit good to year in YYYY format")
+    return year_str
