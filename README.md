@@ -30,3 +30,8 @@ Indexes:
 * Любые сторонние библиотеки
 * PEP8
 * Если останется время, то можете покрыть её тестами с помощью py.test (:
+
+#### Example run
+```bash
+    python3.7 download_pictures.py 320x480 -m Dec -y 2018
+```
