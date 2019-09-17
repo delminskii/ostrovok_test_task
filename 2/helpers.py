@@ -11,7 +11,7 @@ def is_resolution(parser, resolution_str, pattern=r'\d+x\d+'):
     :param pattern: regexp pattern whether to match resolution_str string
     """
     if re.match(pattern, resolution_str) is None:
-        parser.error(f"{resolution_str} does not fit good to image resolution")
+        parser.error(f"`{resolution_str}` does not fit good to image resolution")
     return resolution_str.lower()
 
 
@@ -23,5 +23,5 @@ def is_year(parser, year_str, pattern=r'[12]\d{3}'):
     :param pattern: regexp pattern while to match year_str string
     """
     if re.match(pattern, year_str) is None:
-        parser.error(f"{year_str} does not fit good to year in YYYY format")
+        parser.error(f"`{year_str}` does not fit good to year in YYYY format")
     return year_str
