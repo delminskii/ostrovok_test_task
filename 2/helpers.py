@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import logging
 from urllib.parse import urlparse
 import os
 import aiofiles
@@ -59,11 +60,11 @@ async def download_files(session, urls, output_dir):
             output_dir, '%s.%s' % (filename, ext)
         )
 
-        print(f"Downloadng {i}/{len(urls)}")
+        print(f"Downloading {i}/{len(urls)}...")
+        logging.debug(f"Downloading wallpaper at {url}")
         async with session.get(url) as response:
+            logging.debug(f"Response status code: {response.status}")
             if response.status == 200:
                 async with aiofiles.open(output_filename, 'wb') as writer:
+                    logging.debug(f"{output_filename} is written")
                     await writer.write(await response.read())
-            else:
-                # TODO
-                pass

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import logging
 import datetime
 import os
 import aiohttp
@@ -13,6 +14,12 @@ async def main():
     # instead of default html5.parser (it's slow)
     BS4_BACKEND = 'lxml'
     OUTPUT_DEFAULT_DIR = './output'
+
+    logging.basicConfig(
+        filename='./log.log',
+        format='%(asctime)s %(levelname)s:%(message)s',
+        level=logging.DEBUG
+    )
 
     parser = argparse.ArgumentParser(
         description='Smashing Wallpaper Downloader'
@@ -62,12 +69,11 @@ async def main():
     )
 
     args = parser.parse_args()
-    print(args)
+    logging.debug(f"args: {args}")
 
     url_pattern = 'https://www.smashingmagazine.com/{year}/' \
         '{month_numeric}/desktop-wallpaper-calendars-{month_fullname}-{year}/'
 
-    # TODO (month_numeric)
     url = url_pattern.format(
         year=args.year,
         month_numeric=int(months.get(args.month)[0]) - 1,
@@ -75,7 +81,9 @@ async def main():
     ).lower()
 
     async with aiohttp.ClientSession() as session:
+        logging.debug(f"Requsting URL: {url}")
         async with session.get(url) as response:
+            logging.debug(f"Response status code: {response.status}")
             if response.status == 200:
                 markup = await response.text()
                 soup = BS4(markup, BS4_BACKEND)
@@ -84,18 +92,14 @@ async def main():
                     soup,
                     args.resolution
                 )
+                logging.debug(f"Urls fetched: {len(wallpapers_urls)}")
 
                 if wallpapers_urls:
                     await helpers.download_files(
                         session, wallpapers_urls, args.output
                     )
                 else:
-                    print(f"Nothing was found at page {url}.")
-            else:
-                # TODO: replace print with logging
-                print("something went wrong.")
-                print(f"url: {url}")
-                print(f"status code: {response.status}")
+                    logging.warning(f"No wallpapers' URLs found")
 
 
 if __name__ == '__main__':
