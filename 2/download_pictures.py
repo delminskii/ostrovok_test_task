@@ -65,34 +65,33 @@ async def main():
     url_pattern = 'https://www.smashingmagazine.com/{year}/' \
         '{month_numeric}/desktop-wallpaper-calendars-{month_fullname}-{year}/'
 
+    # TODO (month_numeric)
     url = url_pattern.format(
         year=args.year,
-        month_numeric=months.get(args.month)[0],
+        month_numeric=int(months.get(args.month)[0]) - 1,
         month_fullname=months.get(args.month)[1]
     ).lower()
 
-    print(f"Url: {url}")
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
-            print('Response status code:', response.status)
             if response.status == 200:
                 markup = await response.text()
                 soup = BS4(markup, 'lxml')
-                wallpapers_urls = helpers.get_wallpaper_links(
+
+                wallpapers_urls = helpers.get_wallpapers_links(
                     soup,
                     args.resolution
                 )
 
-                print(wallpapers_urls)
-                print(len(wallpapers_urls))
-
-                # if wallpaper_urls:
-
-                # else:
-                #     # TODO
+                if wallpapers_urls:
+                    await helpers.download_files(session, wallpapers_urls, args.output)
+                else:
+                    print("Nothing was found at page {url}.")
             else:
-                # TODO
-                pass
+                # TODO: replace print with logging
+                print("something went wrong.")
+                print(f"url: {url}")
+                print(f"status code: {response.status}")
 
 
 if __name__ == '__main__':

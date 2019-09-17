@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import re
+from urllib.parse import urlparse
+import os
 import aiofiles
 
 
@@ -30,11 +32,11 @@ def is_year(parser, year_str, pattern=r'[12]\d{3}'):
     return year_str
 
 
-def get_wallpaper_links(soup, resolution):
-    """return a `href` value of `a` tag for a images with `resolution`
+def get_wallpapers_links(soup, resolution):
+    """return `href` values of `a` tags for images with `resolution` resolution
 
     :param soup: BS4 object
-    :param resolution: walpapper resolution. Example: 1900x600
+    :param resolution: wallpaper resolution. Example: 1900x600
     """
     a_tags = soup.select('#article__content ul > li > a')
     a_tags = filter(lambda a: a.text.strip() == resolution, a_tags)
@@ -42,3 +44,22 @@ def get_wallpaper_links(soup, resolution):
     hrefs = map(lambda a: a.get('href'), a_tags)
     hrefs = filter(bool, hrefs)
     return list(hrefs)
+
+
+async def download_files(session, urls, output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    for i, url in enumerate(urls):
+        parsed_url = urlparse(url)
+        filename, ext = os.path.splitext(
+            os.path.basename(parsed_url.path)
+        )
+        output_filename = os.path.join(
+            output_dir, '%s.%s' % (filename, ext)
+        )
+
+        print(f"Downloadng {i}/{len(urls)}")
+        async with session.get(url) as response:
+            async with aiofiles.open(output_filename, 'wb') as writer:
+                await writer.write(await response.read())
