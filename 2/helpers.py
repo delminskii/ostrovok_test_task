@@ -11,7 +11,9 @@ def is_resolution(parser, resolution_str, pattern=r'\d+x\d+'):
     :param pattern: regexp pattern whether to match resolution_str string
     """
     if re.match(pattern, resolution_str) is None:
-        parser.error(f"`{resolution_str}` does not fit good to image resolution")
+        parser.error(
+            f"`{resolution_str}` does not fit good to image resolution"
+        )
     return resolution_str.lower()
 
 
