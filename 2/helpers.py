@@ -61,5 +61,9 @@ async def download_files(session, urls, output_dir):
 
         print(f"Downloadng {i}/{len(urls)}")
         async with session.get(url) as response:
-            async with aiofiles.open(output_filename, 'wb') as writer:
-                await writer.write(await response.read())
+            if response.status == 200:
+                async with aiofiles.open(output_filename, 'wb') as writer:
+                    await writer.write(await response.read())
+            else:
+                # TODO
+                pass

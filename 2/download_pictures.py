@@ -10,13 +10,16 @@ import helpers
 
 
 async def main():
+    # instead of default html5.parser (it's slow)
+    BS4_BACKEND = 'lxml'
+    OUTPUT_DEFAULT_DIR = './output'
+
     parser = argparse.ArgumentParser(
         description='Smashing Wallpaper Downloader'
     )
 
     curr_month = datetime.datetime.now().strftime('%b')
     curr_year = datetime.datetime.now().strftime('%Y')
-    output_default_dir = './output'
 
     # 12 datetimes objects to retrieve months' information
     dates = [
@@ -51,17 +54,16 @@ async def main():
     parser.add_argument(
         '-o', '--output',
         type=str,
-        default=os.path.join(os.getcwd(), output_default_dir),
+        default=os.path.join(os.getcwd(), OUTPUT_DEFAULT_DIR),
         help='''
         A directory to download wallpapers into.
         If ommited it will be created as `%s`
-        ''' % output_default_dir
+        ''' % OUTPUT_DEFAULT_DIR
     )
 
     args = parser.parse_args()
     print(args)
 
-    # form an url
     url_pattern = 'https://www.smashingmagazine.com/{year}/' \
         '{month_numeric}/desktop-wallpaper-calendars-{month_fullname}-{year}/'
 
@@ -76,7 +78,7 @@ async def main():
         async with session.get(url) as response:
             if response.status == 200:
                 markup = await response.text()
-                soup = BS4(markup, 'lxml')
+                soup = BS4(markup, BS4_BACKEND)
 
                 wallpapers_urls = helpers.get_wallpapers_links(
                     soup,
@@ -84,9 +86,11 @@ async def main():
                 )
 
                 if wallpapers_urls:
-                    await helpers.download_files(session, wallpapers_urls, args.output)
+                    await helpers.download_files(
+                        session, wallpapers_urls, args.output
+                    )
                 else:
-                    print("Nothing was found at page {url}.")
+                    print(f"Nothing was found at page {url}.")
             else:
                 # TODO: replace print with logging
                 print("something went wrong.")
