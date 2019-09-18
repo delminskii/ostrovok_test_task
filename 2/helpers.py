@@ -48,6 +48,13 @@ def get_wallpapers_links(soup, resolution):
 
 
 async def download_files(session, urls, output_dir):
+    """download files (images) at `urls` using a `session` session
+    and put them all into one output_dir directory
+
+    :param session: aiohttp clientSession object
+    :param urls: list of urls
+    :param output_dir: name of the output directory
+    """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
